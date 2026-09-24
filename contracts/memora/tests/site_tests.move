@@ -119,7 +119,7 @@ fun single_signer_freeze_and_rollback() {
     ship(&mut sc, &clk, b"v1");
     sc.next_tx(B);
     let mut s = sc.take_shared<Site>();
-    site::freeze(&mut s, sc.ctx());
+    site::freeze_site(&mut s, sc.ctx());
     assert!(site::live_blob_id(&s).is_none());
     site::rollback(&mut s, 0, sc.ctx());
     site::revoke(&mut s, 1, sc.ctx());

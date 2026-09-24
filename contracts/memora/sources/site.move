@@ -84,7 +84,7 @@ public fun create(
     ctx: &mut TxContext,
 ) {
     let signers = vec_set::from_keys(signers);
-    assert!(threshold > 0 && threshold <= signers.size(), EBadConfig);
+    assert!(threshold > 0 && threshold <= signers.length(), EBadConfig);
     let site = Site {
         id: object::new(ctx),
         name,
@@ -135,7 +135,7 @@ public fun approve(site: &mut Site, proposal: u64, ctx: &TxContext) {
     let p = site.proposals.borrow_mut(proposal);
     assert!(!p.approvals.contains(&who), EAlreadyApproved);
     p.approvals.insert(who);
-    event::emit(Approved { site: site_id, proposal, signer: who, approvals: p.approvals.size() });
+    event::emit(Approved { site: site_id, proposal, signer: who, approvals: p.approvals.length() });
 }
 
 /// A staked Sentinel records its verdict on a proposed build. `clean = false`
@@ -156,8 +156,8 @@ public fun promote(site: &mut Site, proposal: u64, clock: &Clock, ctx: &TxContex
     assert!(!site.frozen, EFrozen);
     assert!(site.proposals.contains(proposal), ENoSuchProposal);
     let p = site.proposals.borrow(proposal);
-    assert!(p.approvals.size() >= site.threshold, EThresholdNotMet);
-    assert!(p.clean.size() >= site.required_reviews + p.flagged.size(), EReviewsNotMet);
+    assert!(p.approvals.length() >= site.threshold, EThresholdNotMet);
+    assert!(p.clean.length() >= site.required_reviews + p.flagged.length(), EReviewsNotMet);
 
     let Proposal { blob_id, manifest_root, clean, .. } = site.proposals.remove(proposal);
     site.versions.push_back(Version {
@@ -173,7 +173,7 @@ public fun promote(site: &mut Site, proposal: u64, clock: &Clock, ctx: &TxContex
 }
 
 /// One signer, one transaction: point the site back at a known-good build.
-/// Also clears a freeze, so the incident playbook is `freeze` then `rollback`.
+/// Also clears a freeze, so the incident playbook is `freeze_site` then `rollback`.
 public fun rollback(site: &mut Site, to: u64, ctx: &TxContext) {
     let who = ctx.sender();
     assert_signer(site, who);
@@ -186,7 +186,7 @@ public fun rollback(site: &mut Site, to: u64, ctx: &TxContext) {
 }
 
 /// Any single signer can halt serving. Portals render a maintenance page.
-public fun freeze(site: &mut Site, ctx: &TxContext) {
+public fun freeze_site(site: &mut Site, ctx: &TxContext) {
     let who = ctx.sender();
     assert_signer(site, who);
     site.frozen = true;

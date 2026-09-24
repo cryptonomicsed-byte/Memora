@@ -29,7 +29,7 @@ Keys can still be phished and signers can still be socially engineered. Memora d
 | Stolen CI or env secrets inject a drainer | A proposal alone can't go live. It needs signer threshold plus Sentinel quorum | `site::promote` |
 | DNS or registrar hijack points users elsewhere | Content is pinned by manifest root on-chain, and portals serve only bytes that hash to it | `memora_verify_live` |
 | A single developer account pushes malicious code | M-of-N approval, and Sentinels diff the build against the live one | `site::approve`, `agents/sentinel` |
-| Rollback takes minutes or hours mid-incident | One signer, one tx: `freeze` → `rollback` → `revoke` | `memora_incident_response` |
+| Rollback takes minutes or hours mid-incident | One signer, one tx: `freeze_site` → `rollback` → `revoke` | `memora_incident_response` |
 
 ### 2. Multi-portal access, honestly scoped
 

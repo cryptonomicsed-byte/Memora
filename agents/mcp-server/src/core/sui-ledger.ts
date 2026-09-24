@@ -216,7 +216,7 @@ export class SuiLedger implements SiteLedger {
 
   async freeze(sender: string, siteId: string) {
     this.assertSender(sender);
-    await this.exec("freeze", (tx) => tx.moveCall({ target: this.target("freeze"), arguments: [tx.object(siteId)] }));
+    await this.exec("freeze_site", (tx) => tx.moveCall({ target: this.target("freeze_site"), arguments: [tx.object(siteId)] }));
   }
 
   async revoke(sender: string, siteId: string, version: number) {

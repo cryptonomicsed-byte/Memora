@@ -76,6 +76,12 @@ test("attest passes the registry object", async () => {
   assert.deepEqual(objectIds, [SITE, REG]);
 });
 
+test("freeze targets site::freeze_site (freeze is reserved in Move)", async () => {
+  const h = harness();
+  await h.ledger.freeze(h.me, SITE);
+  assert.equal(h.sent[0].getData().commands[0].MoveCall!.function, "freeze_site");
+});
+
 test("refuses to sign as a different address", async () => {
   const h = harness();
   await assert.rejects(h.ledger.freeze("0x1", SITE), /cannot act as/);

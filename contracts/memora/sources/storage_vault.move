@@ -88,5 +88,5 @@ public fun withdraw<T>(cap: &VaultOwnerCap, v: &mut Vault<T>, amount: u64, ctx: 
     coin::from_balance(v.balance.split(amount), ctx)
 }
 
-public fun balance<T>(v: &Vault<T>): u64 { v.balance.value() }
-public fun site<T>(v: &Vault<T>): ID { v.site }
+public fun available<T>(v: &Vault<T>): u64 { v.balance.value() }
+public fun site_id<T>(v: &Vault<T>): ID { v.site }

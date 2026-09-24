@@ -243,7 +243,7 @@ export class SimulatedLedger implements SiteLedger {
 
   async freeze(sender: string, siteId: string) {
     const s = this.site(siteId);
-    this.assertSigner(s, sender, "freeze");
+    this.assertSigner(s, sender, "freeze_site");
     s.frozen = true;
     this.emit({ type: "Frozen", site: siteId, by: sender });
     this.commit();

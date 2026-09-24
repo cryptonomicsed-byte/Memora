@@ -45,7 +45,7 @@ Next up: an **Elixir/OTP** supervisor for the Sentinel and Portal swarms (fault-
 
 ```
 contracts/memora/sources/
-  site.move               Site object: propose/approve/attest/promote, rollback/freeze/revoke
+  site.move               Site object: propose/approve/attest/promote, rollback/freeze_site/revoke
   sentinel_registry.move  MEMO bonds, 7-day unbonding, slash → burn
   treasury.move           SUI fee split: buyback / portals / sentinels / ops, holder tiers
   memo.move               fixed-supply MEMO, burn-only BurnVault
