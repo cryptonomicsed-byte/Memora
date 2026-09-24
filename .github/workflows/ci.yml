@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  agents:
+    name: Sentinel (Rust) + MCP server (TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Sentinel lint, test, build
+        working-directory: agents/sentinel
+        run: |
+          cargo clippy --all-targets -- -D warnings
+          cargo test
+          cargo build --release
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: agents/mcp-server/package-lock.json
+      - name: MCP server typecheck and test
+        working-directory: agents/mcp-server
+        run: |
+          npm ci
+          npm run typecheck
+          npm test
+
+  move:
+    name: Move build + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Sui CLI (latest release)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/sui "$HOME/.local/bin"
+          gh release download --repo MystenLabs/sui --pattern '*-ubuntu-x86_64.tgz' --dir /tmp/sui
+          tar -xzf /tmp/sui/*.tgz -C /tmp/sui
+          install "$(find /tmp/sui -type f -name sui | head -n1)" "$HOME/.local/bin/sui"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: sui move build
+        working-directory: contracts/memora
+        run: sui --version && sui move build
+      - name: sui move test
+        working-directory: contracts/memora
+        run: sui move test

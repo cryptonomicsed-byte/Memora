@@ -127,3 +127,17 @@ public fun is_active(reg: &Registry, who: address): bool {
 public fun stake_of(reg: &Registry, who: address): u64 {
     if (reg.stakes.contains(who)) { *reg.stakes.borrow(who) } else { 0 }
 }
+
+#[test_only]
+/// Shares a Registry where each of `sentinels` is bonded at the minimum stake.
+public fun share_for_testing(sentinels: vector<address>, ctx: &mut TxContext) {
+    let mut stakes = table::new(ctx);
+    sentinels.do!(|a| stakes.add(a, DEFAULT_MIN_STAKE));
+    transfer::share_object(Registry {
+        id: object::new(ctx),
+        min_stake: DEFAULT_MIN_STAKE,
+        stakes,
+        unbonding_until: table::new(ctx),
+        vault: balance::zero(),
+    });
+}

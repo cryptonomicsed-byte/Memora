@@ -200,9 +200,10 @@ public fun revoke(site: &mut Site, version: u64, ctx: &TxContext) {
     assert_signer(site, who);
     assert!(version < site.versions.length(), ENoSuchVersion);
     assert!(!(site.has_live && site.live == version), ECannotRevokeLive);
+    let site_id = object::id(site);
     let v = &mut site.versions[version];
     v.revoked = true;
-    event::emit(Revoked { site: object::id(site), version, attesters: v.attesters, by: who });
+    event::emit(Revoked { site: site_id, version, attesters: v.attesters, by: who });
 }
 
 fun assert_signer(site: &Site, who: address) {

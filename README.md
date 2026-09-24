@@ -1,6 +1,6 @@
 # Memora
 
-An agent-native launchpad for dApp front-ends. Builds are content-addressed on decentralized storage. What's live is governed by an on-chain Site object. Before any build can go live, it is reviewed by staked Sentinel agents.
+A cryptographically enforced supply-chain guardrail for dApp front-ends: a security and governance layer on top of decentralized storage. Builds are content-addressed on Walrus. What's live is governed by an on-chain Site object. Before any build can go live, it needs M-of-N signer approval and a review quorum from staked Sentinel agents.
 
 **Agents can ship to production without being trusted:** the chain enforces the release policy, not the agent.
 
@@ -49,8 +49,10 @@ contracts/memora/sources/
   sentinel_registry.move  MEMO bonds, 7-day unbonding, slash → burn
   treasury.move           SUI fee split: buyback / portals / sentinels / ops, holder tiers
   memo.move               fixed-supply MEMO, burn-only BurnVault
+  storage_vault.move      per-site prepaid storage renewal, capped + rate-limited keeper draws
+contracts/memora/tests/   Move unit tests (site lifecycle, aborts)
 agents/sentinel/          Rust drainer/injection scanner (lib + CLI)
-agents/mcp-server/        MCP server, simulated ledger mirroring the Move rules, Walrus/FS stores
+agents/mcp-server/        MCP server; SimulatedLedger + SuiLedger (@mysten/sui, gRPC); Walrus/FS stores
 agents/profiles/          agent profiles
 docs/                     value proposition
 ```
@@ -74,8 +76,20 @@ claude mcp add memora -- node /path/to/Memora/agents/mcp-server/src/index.ts
 
 Set `MEMORA_STORAGE=walrus` (and optionally `WALRUS_PUBLISHER`, `WALRUS_AGGREGATOR`, `WALRUS_EPOCHS`) to upload to Walrus testnet instead of the local filesystem store.
 
+To run against a published package on Sui instead of the simulator:
+
+```bash
+cd contracts/memora && sui client publish        # note the package ID and the shared Registry ID
+MEMORA_LEDGER=sui SUI_NETWORK=testnet \
+MEMORA_PACKAGE_ID=0x… MEMORA_REGISTRY_ID=0x… SUI_PRIVATE_KEY=suiprivkey1… \
+npm start
+```
+
+Each agent runs its own server instance with its own key. The `actor` argument on a tool must match that key's address, because the chain, not the tool call, decides who signed.
+
 ## Status
 
-- **Tested:** the Rust scanner (8 unit tests) and the MCP tool flow (7 tests). The tool-flow tests cover the full lifecycle: a clean build ships, an injected drainer gets flagged and promotion aborts, a tampered blob is caught, and incident response rolls back and revokes. They run against a simulated ledger that mirrors the Move abort codes.
-- **Not yet compiled:** the Move package. It targets Sui Move 2024 edition; run `sui move build` before publishing.
-- **Roadmap:** a Sui ledger adapter (PTBs against the published package, replacing `SimulatedLedger` behind the same `SiteLedger` interface), Arweave and Shadow Drive `BlobStore` adapters, portal reward distribution by verified bandwidth, SuiNS resolution, storage auto-renewal, and the Wasm-sandboxed scanner.
+- **Tested locally:** the Rust scanner (8 unit tests) and the MCP server (12 tests). Seven cover the full tool flow against `SimulatedLedger`, which mirrors the Move abort codes. Five cover `SuiLedger` against a mocked chain client: PTB targets and arguments, event decoding, abort mapping, and BCS decoding of the Site and its proposal Table.
+- **CI (`.github/workflows/ci.yml`):** installs the latest Sui CLI release and runs `sui move build` and `sui move test`, plus the Rust and TypeScript suites. The Move package has not been compiled outside CI.
+- **Not yet run against live testnet:** `SuiLedger` needs a published package. The BCS layouts in `sui-ledger.ts` must stay field-for-field in sync with `site.move`.
+- **Roadmap:** Arweave and Shadow Drive `BlobStore` adapters, portal reward distribution by verified bandwidth, SuiNS resolution, yield-funded storage vaults, the Wasm-sandboxed scanner, and an Elixir/OTP supervisor for the Sentinel and Portal swarms.

@@ -1,53 +1,93 @@
 # Memora: Value Proposition
 
-Memora is a launchpad for dApp front-ends. Builds are content-addressed on decentralized storage (Walrus first, with Arweave and Shadow Drive planned). What is live is decided by an on-chain **Site object**, and every build is reviewed by **staked Sentinel agents** before it can go live.
+**Memora is a cryptographically enforced supply-chain guardrail for dApp front-ends. It's a security and governance layer that sits on top of raw decentralized storage.**
+
+Builds are stored content-addressed on Walrus first, with Arweave and Shadow Drive planned. What users actually see is decided by an on-chain **Site object**. A build becomes live only after M-of-N signer approval **and** a quorum of reviews from **staked Sentinels** whose bonds can be slashed.
 
 ## The reframe: agents are the deployers now
 
-Today, coding agents already push to Vercel and AWS through MCP servers and CI tokens. Every one of those credentials is a standing, all-powerful key: whoever holds it (the agent, a leaked token, a hijacked GitHub account) can ship anything to production.
+Coding agents already ship to production through raw CI tokens and cloud APIs. Each of those credentials is a standing key that can deploy anything. An agent that gets hijacked, or one that hallucinates a malicious dependency, ships straight to users.
 
-Memora's thesis is that **agents should be able to ship to production without being trusted.** The guardrails live on-chain, not in the agent's good behavior:
+Memora lets agents ship to production **without being trusted**. The guardrails are enforced by the chain, not by the agent's behavior:
 
-- A Deployer agent can *propose* a build, but it can't make it live.
-- A build goes live only after M-of-N signer approvals **and** a quorum of Sentinel attestations, each Sentinel backed by a slashable bond.
-- Any single signer (or a Guardian agent holding a signer key) can roll back to a known-good build in one transaction.
+- A Deployer agent can *propose* a build. It can't make it live.
+- Promotion needs `threshold` signer approvals **and** `required_reviews` clean Sentinel attestations. Each flag raises the required number of clean reviews by one.
+- Any single signer, including a Guardian agent holding one signer key, can freeze or roll back in one transaction.
 
-That makes Memora a deployment substrate built for autonomous agents: every capability is an MCP tool (`agents/mcp-server`), and every policy is enforced by Move (`contracts/memora`).
-
----
-
-## Part 1: Why host on Memora instead of Vercel or AWS
-
-| Threat on Web2 hosting | What Memora does | Where it lives |
-|---|---|---|
-| **DNS / registrar hijack, stolen CI or env secrets, injected drainer scripts** | Content is pinned by manifest root on-chain. Portals serve only bytes that hash to it. Changing the site takes a signed tx against the Site object. | `site.move::propose/promote`, `memora_verify_live` |
-| **Takedown by the host or its regulators** | Content is replicated across decentralized storage nodes, and anyone can run a Portal. There is no single account to suspend. | `WalrusBlobStore`, portal profile |
-| **A single developer account pushes a malicious update** | Promotion needs `threshold` signer approvals **plus** `required_reviews` clean Sentinel attestations. Each flag raises the bar by one. | `site.move::promote` |
-| **Slow rollback during an active exploit** | Every promoted build is kept immutably. One signer, one tx: `freeze` → `rollback` → `revoke`. | `memora_incident_response` |
-| **Nobody reviews the shipped JS** | Staked Sentinels diff each build against the live one and flag new approvals, raw `eth_sign`, `eval`, new external origins, and encoded payloads. | `agents/sentinel` (Rust) |
-
-**Pitch for developers:** *Ship in one call from your agent or CI to content-addressed, multi-sig-governed hosting. A stolen token can propose a drainer, but it can't make it live. If something bad does go live, one signer reverts it in a single transaction.*
-
-## Part 2: Why hold MEMO
-
-| Mechanism | How it works | Where it lives |
-|---|---|---|
-| **Fee-funded buyback & burn** | Deploy, storage-extension, and domain fees are paid in SUI and split on-chain (default 40% buyback, 30% portals, 20% sentinels, 10% ops). A Keeper agent swaps the buyback pool for MEMO and burns it through a shared `BurnVault`. There is no mint function after genesis. | `treasury.move`, `memo.move` |
-| **Portal operator rewards** | Portal nodes that serve verified bytes share the portal pool. | `treasury::withdraw_portal_rewards` (distribution logic on the roadmap) |
-| **Sentinel staking** | Reviewing builds requires a MEMO bond with a 7-day unbonding window. Attesting to a build later revoked as malicious is slashable, and slashed MEMO is burned. | `sentinel_registry.move` |
-| **Holder tiers** | Locked MEMO reduces fees: ≥1k MEMO 20% off, ≥25k 40% off with priority routing, ≥250k 60% off with continuous Sentinel monitoring. | `treasury::discount_bps` |
-
-**Pitch for holders:** *MEMO is the bond that makes agent reviews trustworthy, and the sink for fees from every deployment on the platform.*
+Every capability is an MCP tool (`agents/mcp-server`), and every rule is enforced in Move (`contracts/memora`).
 
 ---
 
-## Claims to tighten before this goes public
+## Part 1: Why developers deploy through Memora
 
-The original pitch overstates a few things. Sophisticated developers and regulators will notice.
+### 1. Defense in depth, not "un-hackable"
 
-1. **"Un-hackable" isn't true.** Signer keys can still be phished. The honest claim is narrower and still strong: *no single credential can change what users see*. Say that instead.
-2. **Public portals are a chokepoint.** Most users reach a Walrus site through a public HTTP portal, which can be geo-blocked or taken down. Censorship resistance holds for the *content* and for anyone who runs their own portal. Ship a one-command portal and SuiNS-native resolution to back the claim up.
-3. **Storage expires.** Walrus storage is paid per epoch. "Can't be taken down" needs auto-renewal, which is a Keeper agent job and a fee source.
-4. **The front-end still calls centralized RPCs and APIs.** The Sentinel's `new_origins` diff surfaces these, but hosting alone doesn't remove them.
-5. **Token language.** Phrases like "creating upward price pressure" and "invest" tie the token to profit from others' efforts, which is the core of a securities analysis in most jurisdictions. Present MEMO as a bond and fee instrument, keep burn accounting public, and get legal review before launch. The buyback also only matters if fee revenue is large relative to unlocks and emissions, so publish that ratio.
-6. **Competition.** Mysten's own Walrus Sites already covers basic hosting. The moat is what Walrus Sites doesn't have: **staked, slashable, agent-run build review, on-chain release policy, and an MCP-native deploy surface.** Lead with those.
+Keys can still be phished and signers can still be socially engineered. Memora doesn't pretend otherwise. What it guarantees is narrower and verifiable: **no single compromised credential, API key, CI pipeline, or rogue agent can change what live users are served.** An attacker needs to compromise `threshold` independent signers *and* get past `required_reviews` bonded Sentinels, each of whom loses stake if they approve a drainer.
+
+| Web2 failure mode | Memora control | Where |
+|---|---|---|
+| Stolen CI or env secrets inject a drainer | A proposal alone can't go live. It needs signer threshold plus Sentinel quorum | `site::promote` |
+| DNS or registrar hijack points users elsewhere | Content is pinned by manifest root on-chain, and portals serve only bytes that hash to it | `memora_verify_live` |
+| A single developer account pushes malicious code | M-of-N approval, and Sentinels diff the build against the live one | `site::approve`, `agents/sentinel` |
+| Rollback takes minutes or hours mid-incident | One signer, one tx: `freeze` → `rollback` → `revoke` | `memora_incident_response` |
+
+### 2. Multi-portal access, honestly scoped
+
+Files stored on Walrus or Arweave persist independently of any company. **Most people still reach a site through an HTTP portal** (for example, wal.app), and any single portal can be blocked or taken down. Memora treats portals as a **redundant fallback network**, not a single front door:
+
+- Every portal verifies bytes against the on-chain manifest root, so users get the same content whichever portal serves it.
+- Portal operators earn from the portal reward pool, so the network isn't one company's gateway.
+- dApps are encouraged to publish several gateways, including one they self-host, alongside SuiNS resolution.
+
+The accurate claim: **content can't be altered or erased by one party, and access survives as long as any honest portal is reachable.**
+
+### 3. Durable availability through storage vaults
+
+Decentralized blob storage isn't permanent by default. Walrus storage is paid per epoch and expires if it isn't renewed. Memora makes renewal programmatic:
+
+- Each site can have a **Storage Vault** (`storage_vault.move`) that anyone can fund: the team, a DAO, or its users.
+- A Keeper agent draws from the vault and extends the site's blobs in the same transaction. Draws are capped per call and rate-limited, so a compromised keeper can take at most one bounded draw per day. Every draw emits the blob ID it was meant to renew, so it can be audited.
+- *Roadmap:* fund vaults from staking yield (for example, StakedSui or WAL staking rewards), so a site can pay for its own storage indefinitely from principal.
+
+### 4. The security and governance layer on top of Walrus Sites
+
+Mysten's `walrus-sites` tooling handles storing and indexing static sites well. Memora doesn't compete with that layer. It adds what that layer doesn't have:
+
+| | Walrus Sites | Memora |
+|---|---|---|
+| Content-addressed storage | ✅ | ✅ (on Walrus, plus planned Arweave and Shadow Drive adapters) |
+| Multi-sig or DAO approval before a build goes live | — | ✅ `site::approve` / `promote` |
+| Automated drainer and injection scanning | — | ✅ Rust Sentinel, diffed against the live build |
+| Staked, slashable review consensus | — | ✅ `sentinel_registry` |
+| One-tx rollback with revocation of bad builds | — | ✅ `site::rollback` / `revoke` |
+| MCP-native surface for autonomous agents | — | ✅ 15 tools |
+| Programmatic storage renewal | — | ✅ `storage_vault` |
+
+**For developers:** *Let your agents and CI ship to decentralized storage with the guardrails production needs. A stolen token can propose a build but can't make it live, and one signer can revert anything that slips through.*
+
+---
+
+## Part 2: The MEMO token's role
+
+MEMO exists to make the review layer trustworthy and to account for how much the protocol is used. The description below is functional. It isn't a promise of price performance.
+
+| Function | Mechanism | Where |
+|---|---|---|
+| **Security bond** | Sentinels must bond MEMO to review builds. The 7-day unbonding window prevents approve-and-exit. Stake slashed for attesting to a revoked build is **burned**, not redistributed, so reviewers gain nothing from colluding to slash each other. | `sentinel_registry.move` |
+| **Usage-based supply contraction** | Deploy, storage-renewal, and domain fees are paid in SUI and split on-chain (default 40% buyback, 30% portals, 20% Sentinels, 10% operations). A Keeper agent converts the buyback share to MEMO and burns it through a vault that exposes no mint function. Contraction tracks actual protocol usage. | `treasury.move`, `memo.move` |
+| **Service rewards** | Portal operators earn for verified bandwidth. Sentinels earn for security verification. Both are paid from protocol fees, not new issuance. | `treasury::withdraw_*` |
+| **Fee tiers** | Locking MEMO reduces platform fees (20%, 40%, or 60% off) and unlocks priority routing and continuous monitoring. | `treasury::discount_bps` |
+
+**Language guidance for all public material:** say "usage-based supply contraction via programmatic protocol-fee burns" and "staking rewards for bandwidth and security-verification services". Avoid "investment", "returns", "price pressure", and any statement about future value. Publish burn and fee accounting directly from on-chain events (`Burned`, `FeePaid`, `PoolWithdrawn`). Get jurisdiction-specific legal review before any token distribution.
+
+---
+
+## Known limitations
+
+These should appear anywhere the pitch does:
+
+1. Signer and Sentinel keys remain attack targets. Threshold and bonding raise the cost of an attack. They don't eliminate it.
+2. The scanner is heuristic. It catches known drainer patterns and new external origins, not every possible attack. Human-reviewed exceptions go through the `review` verdict.
+3. A front-end can still call centralized RPCs and APIs at runtime. The Sentinel flags new origins, but hosting alone doesn't decentralize them.
+4. Storage renewal depends on vaults being funded, and yield-funded vaults are still on the roadmap.
+5. Fee-based burns are only significant if fee revenue is material relative to token unlocks. Publish both figures.
