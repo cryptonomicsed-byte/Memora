@@ -118,3 +118,6 @@ public fun discount_bps(locked_memo: u64): u64 {
 public fun deploy_action(): Action { Action::Deploy }
 public fun extend_storage_action(): Action { Action::ExtendStorage }
 public fun map_domain_action(): Action { Action::MapDomain }
+
+#[test_only]
+public fun keeper_cap_for_testing(ctx: &mut TxContext): KeeperCap { KeeperCap { id: object::new(ctx) } }

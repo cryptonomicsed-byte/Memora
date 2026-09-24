@@ -39,7 +39,9 @@ public struct VaultOwnerCap has key, store { id: UID, vault: ID }
 public struct Funded has copy, drop { vault: ID, site: ID, amount: u64, by: address }
 public struct RenewalDrawn has copy, drop { vault: ID, site: ID, blob_id: String, amount: u64 }
 
-public fun create<T>(site: ID, max_draw: u64, ctx: &mut TxContext) {
+/// Shares the vault and returns its owner cap, so the caller's PTB decides
+/// where the cap goes (a multisig, a DAO object, or the sender).
+public fun create<T>(site: ID, max_draw: u64, ctx: &mut TxContext): VaultOwnerCap {
     let vault = Vault<T> {
         id: object::new(ctx),
         site,
@@ -49,8 +51,9 @@ public fun create<T>(site: ID, max_draw: u64, ctx: &mut TxContext) {
         last_draw_ms: 0,
         total_drawn: 0,
     };
-    transfer::public_transfer(VaultOwnerCap { id: object::new(ctx), vault: object::id(&vault) }, ctx.sender());
+    let cap = VaultOwnerCap { id: object::new(ctx), vault: object::id(&vault) };
     transfer::share_object(vault);
+    cap
 }
 
 public fun fund<T>(v: &mut Vault<T>, c: Coin<T>, ctx: &TxContext) {
