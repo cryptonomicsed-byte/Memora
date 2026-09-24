@@ -6,9 +6,9 @@
 /// bounds what a compromised keeper could take: at most `max_draw` per call,
 /// no more than once per `min_interval_ms`. Every draw emits the blob it was
 /// meant to renew, so watchers can check the matching extension happened.
-module sigil::storage_vault;
+module immutex::storage_vault;
 
-use sigil::treasury::KeeperCap;
+use immutex::treasury::KeeperCap;
 use std::string::String;
 use sui::balance::{Self, Balance};
 use sui::clock::Clock;

@@ -1,11 +1,11 @@
 {
-  "name": "@sigil/mcp-server",
+  "name": "@immutex/mcp-server",
   "version": "0.1.0",
   "private": true,
-  "description": "MCP tool surface for the Sigil launchpad: agents build, review, promote and roll back content-addressed dApp front-ends",
+  "description": "MCP tool surface for the Immutex launchpad: agents build, review, promote and roll back content-addressed dApp front-ends",
   "type": "module",
   "bin": {
-    "sigil-mcp": "./src/index.ts"
+    "immutex-mcp": "./src/index.ts"
   },
   "engines": {
     "node": ">=22.18"

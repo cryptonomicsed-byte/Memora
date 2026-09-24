@@ -1,8 +1,8 @@
-//! Sigil Sentinel core: a pure, IO-free static scanner for wallet-drainer and
+//! Immutex Sentinel core: a pure, IO-free static scanner for wallet-drainer and
 //! supply-chain injection patterns in static front-end builds.
 //!
 //! The scanner never decides alone. It produces findings; a staked Sentinel
-//! agent turns them into an on-chain attestation (`sigil::site::attest`).
+//! agent turns them into an on-chain attestation (`immutex::site::attest`).
 //! The most important signal is the *diff against the last live build*: a
 //! pattern that already shipped and was reviewed is far less suspicious than
 //! one that appears for the first time in a new build.

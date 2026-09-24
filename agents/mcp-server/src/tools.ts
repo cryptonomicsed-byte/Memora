@@ -1,4 +1,4 @@
-// The Sigil tool surface. Every launchpad capability is a named, schema'd
+// The Immutex tool surface. Every launchpad capability is a named, schema'd
 // tool that any MCP client (a Deployer agent, a Sentinel swarm, a DAO bot,
 // or a human's IDE) can discover and chain. No capability is UI-only.
 
@@ -46,7 +46,7 @@ function lastKnownGood(site: Site): number | undefined {
 
 export const tools: ToolDef[] = [
   tool({
-    name: "sigil_list_agents",
+    name: "immutex_list_agents",
     description:
       "Discover the agent roles operating this launchpad (profiles with goals, skills, memory namespace, sandbox). Re-read from disk on every call.",
     input: {},
@@ -54,14 +54,14 @@ export const tools: ToolDef[] = [
   }),
 
   tool({
-    name: "sigil_build_manifest",
+    name: "immutex_build_manifest",
     description: "Content-address a local static build directory. Returns the manifest root that gets pinned on-chain.",
     input: { dir: z.string().describe("Path to the static build output, e.g. ./dist") },
     run: async (_ctx, { dir }) => manifestOf(await readBuild(dir)),
   }),
 
   tool({
-    name: "sigil_deploy",
+    name: "immutex_deploy",
     description:
       "Upload a build to decentralized storage and open a promotion proposal on the Site. The build does NOT go live until signer threshold and Sentinel review quorum are met.",
     input: { actor, site_id: siteId, dir: z.string() },
@@ -76,7 +76,7 @@ export const tools: ToolDef[] = [
   }),
 
   tool({
-    name: "sigil_create_site",
+    name: "immutex_create_site",
     description: "Create a Site object governed by an M-of-N signer set plus a required number of Sentinel reviews.",
     input: {
       actor,
@@ -89,7 +89,7 @@ export const tools: ToolDef[] = [
   }),
 
   tool({
-    name: "sigil_approve",
+    name: "immutex_approve",
     description: "Add a signer approval to a pending build proposal.",
     input: { actor, site_id: siteId, proposal },
     run: async (ctx, a) => {
@@ -99,7 +99,7 @@ export const tools: ToolDef[] = [
   }),
 
   tool({
-    name: "sigil_review_proposal",
+    name: "immutex_review_proposal",
     description:
       "Sentinel action: fetch a proposed build, check its bytes against the proposed manifest root, scan it for drainer and injection patterns against the live build, and attest on-chain. clean -> attest clean, block -> attest flag, review -> no attestation (escalate).",
     input: {
@@ -140,14 +140,14 @@ export const tools: ToolDef[] = [
   }),
 
   tool({
-    name: "sigil_promote",
+    name: "immutex_promote",
     description: "Make an approved, reviewed proposal the live version. Aborts unless the signer threshold and review quorum are met.",
     input: { actor, site_id: siteId, proposal },
     run: async (ctx, a) => ({ liveVersion: await ctx.ledger.promote(a.actor, a.site_id, a.proposal) }),
   }),
 
   tool({
-    name: "sigil_rollback",
+    name: "immutex_rollback",
     description:
       "One-transaction rollback to a previously promoted, non-revoked version. Needs only one signer. Defaults to the last known-good version before the current one.",
     input: { actor, site_id: siteId, to: z.number().int().nonnegative().optional() },
@@ -161,7 +161,7 @@ export const tools: ToolDef[] = [
   }),
 
   tool({
-    name: "sigil_incident_response",
+    name: "immutex_incident_response",
     description:
       "Playbook for a compromised live build: freeze serving, roll back to the last known-good version, revoke the bad version, and record it in memory. Returns the Sentinels who attested the bad build (slashing evidence for governance).",
     input: { actor, site_id: siteId, reason: z.string(), memory_namespace: z.string().default("guardian") },
@@ -183,7 +183,7 @@ export const tools: ToolDef[] = [
   }),
 
   tool({
-    name: "sigil_site_status",
+    name: "immutex_site_status",
     description: "Read a Site: signers, thresholds, live version, version history, and pending proposals with their approval and review counts.",
     input: { site_id: siteId },
     run: async (ctx, { site_id }) => {
@@ -193,7 +193,7 @@ export const tools: ToolDef[] = [
   }),
 
   tool({
-    name: "sigil_verify_live",
+    name: "immutex_verify_live",
     description:
       "Portal/verifier action: fetch the live blob from storage, recompute its manifest root from the bytes, and compare it to the on-chain root. A mismatch means storage or the portal is serving tampered content.",
     input: { site_id: siteId },
@@ -211,21 +211,21 @@ export const tools: ToolDef[] = [
   }),
 
   tool({
-    name: "sigil_events",
+    name: "immutex_events",
     description: "On-chain event log for a Site (Proposed, Attested, Promoted, RolledBack, Revoked…). Agents read it to reconstruct history.",
     input: { site_id: siteId.optional() },
     run: async (ctx, { site_id }) => ctx.ledger.events(site_id),
   }),
 
   tool({
-    name: "sigil_remember",
+    name: "immutex_remember",
     description: "Append a record to an agent's memory namespace.",
     input: { namespace: z.string(), kind: z.string(), content: z.string(), tags: z.array(z.string()).default([]) },
     run: async (ctx, a) => ctx.memory.remember(a.namespace, a.kind, a.content, a.tags),
   }),
 
   tool({
-    name: "sigil_recall",
+    name: "immutex_recall",
     description: "Search an agent's memory namespace, newest first.",
     input: {
       namespace: z.string(),

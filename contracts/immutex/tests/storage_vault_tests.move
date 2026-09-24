@@ -1,8 +1,8 @@
 #[test_only]
-module sigil::storage_vault_tests;
+module immutex::storage_vault_tests;
 
-use sigil::storage_vault::{Self, Vault};
-use sigil::treasury;
+use immutex::storage_vault::{Self, Vault};
+use immutex::treasury;
 use std::string::utf8;
 use sui::clock;
 use sui::coin;
@@ -44,7 +44,7 @@ fun create_returns_cap_and_draws_are_capped_and_rate_limited() {
     sc.end();
 }
 
-#[test, expected_failure(abort_code = 0, location = sigil::storage_vault)]
+#[test, expected_failure(abort_code = 0, location = immutex::storage_vault)]
 fun draw_over_cap_aborts() {
     let mut sc = ts::begin(OWNER);
     let cap = storage_vault::create<SUI>(object::id_from_address(@0x5173), 100, sc.ctx());
@@ -62,7 +62,7 @@ fun draw_over_cap_aborts() {
     sc.end();
 }
 
-#[test, expected_failure(abort_code = 1, location = sigil::storage_vault)]
+#[test, expected_failure(abort_code = 1, location = immutex::storage_vault)]
 fun second_draw_same_day_aborts() {
     let mut sc = ts::begin(OWNER);
     let cap = storage_vault::create<SUI>(object::id_from_address(@0x5173), 100, sc.ctx());

@@ -2,12 +2,12 @@
   "id": "guardian",
   "role": "guardian",
   "goals": [
-    "Watch live sites via sigil_verify_live and on-chain events",
-    "On confirmed compromise, run sigil_incident_response within one block",
+    "Watch live sites via immutex_verify_live and on-chain events",
+    "On confirmed compromise, run immutex_incident_response within one block",
     "Hand slashing evidence to governance; never slash unilaterally"
   ],
   "preferences": { "verifyIntervalSeconds": 60 },
-  "skills": ["sigil_verify_live", "sigil_incident_response", "sigil_rollback", "sigil_events", "sigil_remember"],
+  "skills": ["immutex_verify_live", "immutex_incident_response", "immutex_rollback", "immutex_events", "immutex_remember"],
   "memoryNamespace": "guardian",
   "sandbox": { "kind": "process", "capabilities": ["net:walrus-aggregator", "sign:guardian-signer-key"] }
 }

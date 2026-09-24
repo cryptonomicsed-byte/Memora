@@ -1,12 +1,12 @@
 /// Fee router. Every platform action (deploy, storage-epoch extension, domain
 /// mapping) pays a SUI fee here, and it's split on-chain into:
-///   * buyback: a keeper agent swaps it for SIGIL on a DEX and calls
-///     `sigil::burn_buyback`. Both legs are public events, so anyone can
+///   * buyback: a keeper agent swaps it for IMMUTEX on a DEX and calls
+///     `immutex::burn_buyback`. Both legs are public events, so anyone can
 ///     check that what came in was actually burned.
 ///   * portals: reward pool for Portal/CDN node operators.
 ///   * sentinels: reward pool for staked build reviewers.
 ///   * ops: protocol operations.
-module sigil::treasury;
+module immutex::treasury;
 
 use sui::balance::{Self, Balance};
 use sui::coin::{Self, Coin};
@@ -104,10 +104,10 @@ public fun set_split(_: &AdminCap, t: &mut Treasury, buyback_bps: u64, portal_bp
     t.sentinel_bps = sentinel_bps;
 }
 
-/// Holder tiers: fee discount in bps for a given amount of locked SIGIL (9 decimals).
-///   Tier 1 >= 1,000 SIGIL: 20% off
-///   Tier 2 >= 25,000 SIGIL: 40% off (plus priority portal routing, enforced off-chain)
-///   Tier 3 >= 250,000 SIGIL: 60% off (plus continuous Sentinel monitoring)
+/// Holder tiers: fee discount in bps for a given amount of locked IMMUTEX (9 decimals).
+///   Tier 1 >= 1,000 IMMUTEX: 20% off
+///   Tier 2 >= 25,000 IMMUTEX: 40% off (plus priority portal routing, enforced off-chain)
+///   Tier 3 >= 250,000 IMMUTEX: 60% off (plus continuous Sentinel monitoring)
 public fun discount_bps(locked_memo: u64): u64 {
     if (locked_memo >= 250_000_000_000_000) { 6_000 }
     else if (locked_memo >= 25_000_000_000_000) { 4_000 }

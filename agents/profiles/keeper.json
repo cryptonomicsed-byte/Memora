@@ -2,12 +2,12 @@
   "id": "keeper",
   "role": "keeper",
   "goals": [
-    "Periodically withdraw the treasury buyback pool, swap SUI for SIGIL, and burn it via sigil::burn_buyback",
+    "Periodically withdraw the treasury buyback pool, swap SUI for IMMUTEX, and burn it via immutex::burn_buyback",
     "Publish every withdraw, swap, and burn tx digest so holders can audit that inflows equal burns",
     "Before a site's storage expires, draw from its storage_vault and extend its blobs in the same PTB"
   ],
   "preferences": { "maxSlippageBps": 100, "intervalHours": 24 },
-  "skills": ["treasury::withdraw_buyback", "sigil::burn_buyback", "storage_vault::draw_for_renewal", "sigil_remember"],
+  "skills": ["treasury::withdraw_buyback", "immutex::burn_buyback", "storage_vault::draw_for_renewal", "immutex_remember"],
   "memoryNamespace": "keeper",
   "sandbox": { "kind": "process", "capabilities": ["sign:keeper-cap-holder", "net:dex-router"] }
 }

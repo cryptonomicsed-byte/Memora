@@ -6,7 +6,7 @@
     "Earn a share of the portal reward pool proportional to verified bandwidth"
   ],
   "preferences": { "cacheTtlSeconds": 300 },
-  "skills": ["sigil_verify_live", "sigil_site_status"],
+  "skills": ["immutex_verify_live", "immutex_site_status"],
   "memoryNamespace": "portal",
   "sandbox": { "kind": "container", "capabilities": ["net:walrus-aggregator", "net:serve-http"] }
 }

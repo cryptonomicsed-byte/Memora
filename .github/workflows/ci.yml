@@ -47,8 +47,8 @@ jobs:
           install "$(find /tmp/sui -type f -name sui | head -n1)" "$HOME/.local/bin/sui"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: sui move build
-        working-directory: contracts/sigil
+        working-directory: contracts/immutex
         run: sui --version && sui move build
       - name: sui move test
-        working-directory: contracts/sigil
+        working-directory: contracts/immutex
         run: sui move test

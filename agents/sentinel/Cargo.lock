@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "sigil-sentinel"
+name = "immutex-sentinel"
 version = "0.1.0"

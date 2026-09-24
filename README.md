@@ -1,4 +1,4 @@
-# Sigil
+# Immutex
 
 A cryptographically enforced supply-chain guardrail for dApp front-ends: a security and governance layer on top of decentralized storage. Builds are content-addressed on Walrus. What's live is governed by an on-chain Site object. Before any build can go live, it needs M-of-N signer approval and a review quorum from staked Sentinel agents.
 
@@ -10,14 +10,14 @@ A cryptographically enforced supply-chain guardrail for dApp front-ends: a secur
 
 ```
             ┌────────────── MCP tool surface (agents/mcp-server) ──────────────┐
- Deployer ──┤ sigil_deploy ─────────────► Site.propose                        │
- Signers  ──┤ sigil_approve ────────────► Site.approve  (M-of-N)              │
- Sentinel ──┤ sigil_review_proposal ─► Rust scan ─► Site.attest (staked)      │
- Deployer ──┤ sigil_promote ────────────► Site.promote  (threshold + quorum)  │
- Guardian ──┤ sigil_verify_live / sigil_incident_response                    │
+ Deployer ──┤ immutex_deploy ─────────────► Site.propose                        │
+ Signers  ──┤ immutex_approve ────────────► Site.approve  (M-of-N)              │
+ Sentinel ──┤ immutex_review_proposal ─► Rust scan ─► Site.attest (staked)      │
+ Deployer ──┤ immutex_promote ────────────► Site.promote  (threshold + quorum)  │
+ Guardian ──┤ immutex_verify_live / immutex_incident_response                    │
             │                    ─► freeze → rollback → revoke (1 signer)      │
- Portal   ──┤ sigil_verify_live: serve only bytes matching the on-chain root  │
- Keeper   ──┤ treasury.withdraw_buyback → DEX swap → sigil.burn_buyback         │
+ Portal   ──┤ immutex_verify_live: serve only bytes matching the on-chain root  │
+ Keeper   ──┤ treasury.withdraw_buyback → DEX swap → immutex.burn_buyback         │
             └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -29,13 +29,13 @@ A cryptographically enforced supply-chain guardrail for dApp front-ends: a secur
 | Portal | `portal.json` | container; aggregator, HTTP serve | `portal` |
 | Keeper | `keeper.json` | process; KeeperCap, DEX router | `keeper` |
 
-Profiles are re-read from disk on every `sigil_list_agents` call, so dropping in a new JSON file registers a new role without a restart. Memory is append-only JSONL per namespace (`sigil_remember` / `sigil_recall`). Sentinels record each verdict there and recall past reviews of a site before judging the next one.
+Profiles are re-read from disk on every `immutex_list_agents` call, so dropping in a new JSON file registers a new role without a restart. Memory is append-only JSONL per namespace (`immutex_remember` / `immutex_recall`). Sentinels record each verdict there and recall past reviews of a site before judging the next one.
 
 ## Languages
 
 | Component | Language | Why |
 |---|---|---|
-| `contracts/sigil` | **Move** (Sui) | Object-capability model: Site, caps, and balances are typed resources, and one-tx rollback falls out naturally |
+| `contracts/immutex` | **Move** (Sui) | Object-capability model: Site, caps, and balances are typed resources, and one-tx rollback falls out naturally |
 | `agents/sentinel` | **Rust** | Zero-dependency, IO-free core that parses hostile input safely and compiles to `wasm32-wasip1` for sandboxed reviewers |
 | `agents/mcp-server` | **TypeScript** | Reference MCP SDK, Walrus HTTP API, and the web/JS ecosystem the scanned builds come from |
 
@@ -44,13 +44,13 @@ Next up: an **Elixir/OTP** supervisor for the Sentinel and Portal swarms (fault-
 ## Layout
 
 ```
-contracts/sigil/sources/
+contracts/immutex/sources/
   site.move               Site object: propose/approve/attest/promote, rollback/freeze_site/revoke
-  sentinel_registry.move  SIGIL bonds, 7-day unbonding, slash → burn
+  sentinel_registry.move  IMMUTEX bonds, 7-day unbonding, slash → burn
   treasury.move           SUI fee split: buyback / portals / sentinels / ops, holder tiers
-  sigil.move               fixed-supply SIGIL, burn-only BurnVault
+  immutex.move               fixed-supply IMMUTEX, burn-only BurnVault
   storage_vault.move      per-site prepaid storage renewal, capped + rate-limited keeper draws
-contracts/sigil/tests/   Move unit tests (site lifecycle, aborts)
+contracts/immutex/tests/   Move unit tests (site lifecycle, aborts)
 agents/sentinel/          Rust drainer/injection scanner (lib + CLI)
 agents/mcp-server/        MCP server; SimulatedLedger + SuiLedger (@mysten/sui, gRPC); Walrus/FS stores
 agents/profiles/          agent profiles
@@ -65,23 +65,23 @@ cd agents/sentinel && cargo test && cargo build --release
 
 # 2. Run the MCP server (Node ≥ 22.18, runs TypeScript directly)
 cd ../mcp-server && npm install && npm test
-npm start          # stdio MCP server; state in ./.sigil
+npm start          # stdio MCP server; state in ./.immutex
 ```
 
 Register it with any MCP client, e.g. Claude Code:
 
 ```bash
-claude mcp add sigil -- node /path/to/repo/agents/mcp-server/src/index.ts
+claude mcp add immutex -- node /path/to/repo/agents/mcp-server/src/index.ts
 ```
 
-Set `SIGIL_STORAGE=walrus` (and optionally `WALRUS_PUBLISHER`, `WALRUS_AGGREGATOR`, `WALRUS_EPOCHS`) to upload to Walrus testnet instead of the local filesystem store.
+Set `IMMUTEX_STORAGE=walrus` (and optionally `WALRUS_PUBLISHER`, `WALRUS_AGGREGATOR`, `WALRUS_EPOCHS`) to upload to Walrus testnet instead of the local filesystem store.
 
 To run against a published package on Sui instead of the simulator:
 
 ```bash
-cd contracts/sigil && sui client publish        # note the package ID and the shared Registry ID
-SIGIL_LEDGER=sui SUI_NETWORK=testnet \
-SIGIL_PACKAGE_ID=0x… SIGIL_REGISTRY_ID=0x… SUI_PRIVATE_KEY=suiprivkey1… \
+cd contracts/immutex && sui client publish        # note the package ID and the shared Registry ID
+IMMUTEX_LEDGER=sui SUI_NETWORK=testnet \
+IMMUTEX_PACKAGE_ID=0x… IMMUTEX_REGISTRY_ID=0x… SUI_PRIVATE_KEY=suiprivkey1… \
 npm start
 ```
 

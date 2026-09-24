@@ -1,9 +1,9 @@
-// SiteLedger backed by the published sigil Move package on Sui.
+// SiteLedger backed by the published immutex Move package on Sui.
 //
-// Writes are single-command PTBs against sigil::site. Reads decode the Site
+// Writes are single-command PTBs against immutex::site. Reads decode the Site
 // object and its proposal Table entries straight from BCS, so the
-// layouts below must match contracts/sigil/sources/site.move field for
-// field. Aborts in sigil::site are re-raised as the same MoveAbort the
+// layouts below must match contracts/immutex/sources/site.move field for
+// field. Aborts in immutex::site are re-raised as the same MoveAbort the
 // SimulatedLedger throws, so tools and agents handle both identically.
 
 import { bcs } from "@mysten/sui/bcs";
@@ -143,7 +143,7 @@ export class SuiLedger implements SiteLedger {
       const err = t.status.error;
       const abort = err?.$kind === "MoveAbort" ? err.MoveAbort : undefined;
       if (abort && (abort.location?.module ?? "site") === "site") throw new MoveAbort(num(abort.abortCode), fn);
-      throw new Error(`sigil::site::${fn} failed: ${err?.message ?? "unknown error"}`);
+      throw new Error(`immutex::site::${fn} failed: ${err?.message ?? "unknown error"}`);
     }
     await this.cfg.core.waitForTransaction({ digest: t.digest });
     return t;
@@ -278,7 +278,7 @@ export class SuiLedger implements SiteLedger {
     };
   }
 
-  /** First page (≤50) of sigil::site events, optionally filtered to one Site. */
+  /** First page (≤50) of immutex::site events, optionally filtered to one Site. */
   async events(siteId?: string): Promise<LedgerEvent[]> {
     const { events } = await this.cfg.core.listEvents({ filter: { eventType: `${this.cfg.packageId}::site` }, limit: 50 });
     const want = siteId && normalizeSuiAddress(siteId);

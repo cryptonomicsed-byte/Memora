@@ -7,7 +7,7 @@
     "Keep false-positive rate low by recalling past reviews of the same site"
   ],
   "preferences": { "escalateOnVerdict": "review", "maxScanSeconds": 60 },
-  "skills": ["sigil_review_proposal", "sigil_recall", "sigil_remember", "sigil_events"],
+  "skills": ["immutex_review_proposal", "immutex_recall", "immutex_remember", "immutex_events"],
   "memoryNamespace": "sentinel",
   "sandbox": { "kind": "process+wasm", "capabilities": ["net:walrus-aggregator", "sign:sentinel-key"] }
 }

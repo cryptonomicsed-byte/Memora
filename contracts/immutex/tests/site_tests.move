@@ -1,8 +1,8 @@
 #[test_only]
-module sigil::site_tests;
+module immutex::site_tests;
 
-use sigil::sentinel_registry::{Self, Registry};
-use sigil::site::{Self, Site};
+use immutex::sentinel_registry::{Self, Registry};
+use immutex::site::{Self, Site};
 use std::string::utf8;
 use sui::clock::{Self, Clock};
 use sui::test_scenario::{Self as ts, Scenario};
@@ -77,14 +77,14 @@ fun ships_after_threshold_and_review() {
     finish(sc, clk);
 }
 
-#[test, expected_failure(abort_code = 0, location = sigil::site)]
+#[test, expected_failure(abort_code = 0, location = immutex::site)]
 fun non_signer_cannot_propose() {
     let (mut sc, clk) = setup();
     propose(&mut sc, &clk, MALLORY, b"evil");
     finish(sc, clk);
 }
 
-#[test, expected_failure(abort_code = 2, location = sigil::site)]
+#[test, expected_failure(abort_code = 2, location = immutex::site)]
 fun one_signer_cannot_promote() {
     let (mut sc, clk) = setup();
     let p = propose(&mut sc, &clk, A, b"v0");
@@ -93,7 +93,7 @@ fun one_signer_cannot_promote() {
     finish(sc, clk);
 }
 
-#[test, expected_failure(abort_code = 3, location = sigil::site)]
+#[test, expected_failure(abort_code = 3, location = immutex::site)]
 fun a_flag_raises_the_review_bar() {
     let (mut sc, clk) = setup();
     let p = propose(&mut sc, &clk, A, b"v0");
@@ -104,7 +104,7 @@ fun a_flag_raises_the_review_bar() {
     finish(sc, clk);
 }
 
-#[test, expected_failure(abort_code = 6, location = sigil::site)]
+#[test, expected_failure(abort_code = 6, location = immutex::site)]
 fun unbonded_address_cannot_attest() {
     let (mut sc, clk) = setup();
     let p = propose(&mut sc, &clk, A, b"v0");
@@ -129,7 +129,7 @@ fun single_signer_freeze_and_rollback() {
     finish(sc, clk);
 }
 
-#[test, expected_failure(abort_code = 9, location = sigil::site)]
+#[test, expected_failure(abort_code = 9, location = immutex::site)]
 fun cannot_roll_back_to_revoked() {
     let (mut sc, clk) = setup();
     ship(&mut sc, &clk, b"v0");
