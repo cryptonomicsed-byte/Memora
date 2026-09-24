@@ -1,0 +1,9 @@
+[package]
+name = "immutex"
+edition = "2024"
+
+[dependencies]
+# Sui framework is implicit for Sui CLI >= 1.45.
+
+[addresses]
+immutex = "0x0"
