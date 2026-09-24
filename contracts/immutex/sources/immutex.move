@@ -1,4 +1,4 @@
-/// IMMUTEX: the Immutex platform token.
+/// IMTX: the Immutex platform token (Move type `immutex::immutex::IMMUTEX`).
 ///
 /// Fixed supply. The whole supply is minted once at publish time; the
 /// TreasuryCap is then locked inside a shared `BurnVault` that exposes
@@ -9,7 +9,7 @@ module immutex::immutex;
 use sui::coin::{Self, Coin, TreasuryCap};
 use sui::event;
 
-/// 1,000,000,000 IMMUTEX with 9 decimals.
+/// 1,000,000,000 IMTX with 9 decimals.
 const TOTAL_SUPPLY: u64 = 1_000_000_000_000_000_000;
 
 public struct IMMUTEX has drop {}
@@ -35,7 +35,7 @@ fun init(witness: IMMUTEX, ctx: &mut TxContext) {
     let (mut cap, metadata) = coin::create_currency(
         witness,
         9,
-        b"IMMUTEX",
+        b"IMTX",
         b"Immutex",
         b"Captures fees from agent-native, content-addressed dApp hosting.",
         option::none(),

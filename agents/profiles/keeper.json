@@ -2,7 +2,7 @@
   "id": "keeper",
   "role": "keeper",
   "goals": [
-    "Periodically withdraw the treasury buyback pool, swap SUI for IMMUTEX, and burn it via immutex::burn_buyback",
+    "Periodically withdraw the treasury buyback pool, swap SUI for IMTX, and burn it via immutex::burn_buyback",
     "Publish every withdraw, swap, and burn tx digest so holders can audit that inflows equal burns",
     "Before a site's storage expires, draw from its storage_vault and extend its blobs in the same PTB"
   ],

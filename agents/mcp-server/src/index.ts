@@ -97,7 +97,7 @@ for (const t of tools) {
 if (simulated) server.registerTool(
   "immutex_sim_stake_sentinel",
   {
-    description: "SIMULATED LEDGER ONLY: bond a Sentinel address so it can attest. On Sui, call sentinel_registry::stake with IMMUTEX instead.",
+    description: "SIMULATED LEDGER ONLY: bond a Sentinel address so it can attest. On Sui, call sentinel_registry::stake with IMTX instead.",
     inputSchema: { sentinel: z.string(), amount: z.number().int().positive() },
   },
   async ({ sentinel, amount }) => {

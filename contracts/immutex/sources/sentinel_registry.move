@@ -2,9 +2,9 @@
 ///
 /// A Sentinel is usually an autonomous agent running `immutex-sentinel` in a
 /// sandbox, but the contract doesn't care what it is. It only needs a bonded
-/// IMMUTEX stake. An attestation is a claim backed by that stake. If a build a
+/// IMTX stake. An attestation is a claim backed by that stake. If a build a
 /// Sentinel called clean is later revoked as malicious, the SlashCap holder
-/// (a DAO or multi-sig) can slash the bond, and the slashed IMMUTEX is burned.
+/// (a DAO or multi-sig) can slash the bond, and the slashed IMTX is burned.
 module immutex::sentinel_registry;
 
 use immutex::immutex::{IMMUTEX, BurnVault, burn_slashed};
@@ -26,7 +26,7 @@ const BPS: u64 = 10_000;
 /// detected, so a Sentinel can't attest to a drainer and then unbond before
 /// it's caught.
 const UNBONDING_MS: u64 = 7 * 24 * 60 * 60 * 1000;
-/// 10,000 IMMUTEX.
+/// 10,000 IMTX.
 const DEFAULT_MIN_STAKE: u64 = 10_000_000_000_000;
 
 public struct Registry has key {

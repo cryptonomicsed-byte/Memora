@@ -67,16 +67,16 @@ Mysten's `walrus-sites` tooling handles storing and indexing static sites well. 
 
 ---
 
-## Part 2: The IMMUTEX token's role
+## Part 2: The IMTX token's role
 
-IMMUTEX exists to make the review layer trustworthy and to account for how much the protocol is used. The description below is functional. It isn't a promise of price performance.
+IMTX exists to make the review layer trustworthy and to account for how much the protocol is used. The description below is functional. It isn't a promise of price performance.
 
 | Function | Mechanism | Where |
 |---|---|---|
-| **Security bond** | Sentinels must bond IMMUTEX to review builds. The 7-day unbonding window prevents approve-and-exit. Stake slashed for attesting to a revoked build is **burned**, not redistributed, so reviewers gain nothing from colluding to slash each other. | `sentinel_registry.move` |
-| **Usage-based supply contraction** | Deploy, storage-renewal, and domain fees are paid in SUI and split on-chain (default 40% buyback, 30% portals, 20% Sentinels, 10% operations). A Keeper agent converts the buyback share to IMMUTEX and burns it through a vault that exposes no mint function. Contraction tracks actual protocol usage. | `treasury.move`, `immutex.move` |
+| **Security bond** | Sentinels must bond IMTX to review builds. The 7-day unbonding window prevents approve-and-exit. Stake slashed for attesting to a revoked build is **burned**, not redistributed, so reviewers gain nothing from colluding to slash each other. | `sentinel_registry.move` |
+| **Usage-based supply contraction** | Deploy, storage-renewal, and domain fees are paid in SUI and split on-chain (default 40% buyback, 30% portals, 20% Sentinels, 10% operations). A Keeper agent converts the buyback share to IMTX and burns it through a vault that exposes no mint function. Contraction tracks actual protocol usage. | `treasury.move`, `immutex.move` |
 | **Service rewards** | Portal operators earn for verified bandwidth. Sentinels earn for security verification. Both are paid from protocol fees, not new issuance. | `treasury::withdraw_*` |
-| **Fee tiers** | Locking IMMUTEX reduces platform fees (20%, 40%, or 60% off) and unlocks priority routing and continuous monitoring. | `treasury::discount_bps` |
+| **Fee tiers** | Locking IMTX reduces platform fees (20%, 40%, or 60% off) and unlocks priority routing and continuous monitoring. | `treasury::discount_bps` |
 
 **Language guidance for all public material:** say "usage-based supply contraction via programmatic protocol-fee burns" and "staking rewards for bandwidth and security-verification services". Avoid "investment", "returns", "price pressure", and any statement about future value. Publish burn and fee accounting directly from on-chain events (`Burned`, `FeePaid`, `PoolWithdrawn`). Get jurisdiction-specific legal review before any token distribution.
 

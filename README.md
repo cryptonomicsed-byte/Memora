@@ -46,9 +46,9 @@ Next up: an **Elixir/OTP** supervisor for the Sentinel and Portal swarms (fault-
 ```
 contracts/immutex/sources/
   site.move               Site object: propose/approve/attest/promote, rollback/freeze_site/revoke
-  sentinel_registry.move  IMMUTEX bonds, 7-day unbonding, slash → burn
+  sentinel_registry.move  IMTX bonds, 7-day unbonding, slash → burn
   treasury.move           SUI fee split: buyback / portals / sentinels / ops, holder tiers
-  immutex.move               fixed-supply IMMUTEX, burn-only BurnVault
+  immutex.move               fixed-supply IMTX, burn-only BurnVault
   storage_vault.move      per-site prepaid storage renewal, capped + rate-limited keeper draws
 contracts/immutex/tests/   Move unit tests (site lifecycle, aborts)
 agents/sentinel/          Rust drainer/injection scanner (lib + CLI)
