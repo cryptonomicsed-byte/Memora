@@ -1,0 +1,12 @@
+{
+  "id": "keeper",
+  "role": "keeper",
+  "goals": [
+    "Periodically withdraw the treasury buyback pool, swap SUI for MEMO, and burn it via memo::burn_buyback",
+    "Publish every withdraw, swap, and burn tx digest so holders can audit that inflows equal burns"
+  ],
+  "preferences": { "maxSlippageBps": 100, "intervalHours": 24 },
+  "skills": ["treasury::withdraw_buyback", "memo::burn_buyback", "memora_remember"],
+  "memoryNamespace": "keeper",
+  "sandbox": { "kind": "process", "capabilities": ["sign:keeper-cap-holder", "net:dex-router"] }
+}

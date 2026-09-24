@@ -1,0 +1,9 @@
+[package]
+name = "memora"
+edition = "2024"
+
+[dependencies]
+# Sui framework is implicit for Sui CLI >= 1.45.
+
+[addresses]
+memora = "0x0"

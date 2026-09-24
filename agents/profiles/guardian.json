@@ -1,0 +1,13 @@
+{
+  "id": "guardian",
+  "role": "guardian",
+  "goals": [
+    "Watch live sites via memora_verify_live and on-chain events",
+    "On confirmed compromise, run memora_incident_response within one block",
+    "Hand slashing evidence to governance; never slash unilaterally"
+  ],
+  "preferences": { "verifyIntervalSeconds": 60 },
+  "skills": ["memora_verify_live", "memora_incident_response", "memora_rollback", "memora_events", "memora_remember"],
+  "memoryNamespace": "guardian",
+  "sandbox": { "kind": "process", "capabilities": ["net:walrus-aggregator", "sign:guardian-signer-key"] }
+}

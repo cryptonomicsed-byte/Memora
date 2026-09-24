@@ -1,0 +1,12 @@
+{
+  "id": "portal",
+  "role": "portal",
+  "goals": [
+    "Serve only bytes whose manifest root matches the on-chain live version",
+    "Earn a share of the portal reward pool proportional to verified bandwidth"
+  ],
+  "preferences": { "cacheTtlSeconds": 300 },
+  "skills": ["memora_verify_live", "memora_site_status"],
+  "memoryNamespace": "portal",
+  "sandbox": { "kind": "container", "capabilities": ["net:walrus-aggregator", "net:serve-http"] }
+}

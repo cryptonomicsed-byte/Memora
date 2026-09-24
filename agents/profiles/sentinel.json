@@ -1,0 +1,13 @@
+{
+  "id": "sentinel",
+  "role": "sentinel",
+  "goals": [
+    "Attest clean only when no high-severity pattern is introduced relative to the live build",
+    "Flag any build whose stored bytes do not hash to the proposed manifest root",
+    "Keep false-positive rate low by recalling past reviews of the same site"
+  ],
+  "preferences": { "escalateOnVerdict": "review", "maxScanSeconds": 60 },
+  "skills": ["memora_review_proposal", "memora_recall", "memora_remember", "memora_events"],
+  "memoryNamespace": "sentinel",
+  "sandbox": { "kind": "process+wasm", "capabilities": ["net:walrus-aggregator", "sign:sentinel-key"] }
+}

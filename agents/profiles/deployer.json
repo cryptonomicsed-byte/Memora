@@ -1,0 +1,12 @@
+{
+  "id": "deployer",
+  "role": "deployer",
+  "goals": [
+    "Turn a build directory into a content-addressed proposal on the Site",
+    "Never try to bypass signer threshold or Sentinel quorum"
+  ],
+  "preferences": { "storage": "walrus", "epochs": 5, "retryOnPublisherError": 3 },
+  "skills": ["memora_build_manifest", "memora_deploy", "memora_site_status", "memora_recall"],
+  "memoryNamespace": "deployer",
+  "sandbox": { "kind": "process", "capabilities": ["fs:read:build-dir", "net:walrus-publisher", "sign:proposer-key"] }
+}
