@@ -1,5 +1,5 @@
 // SiteLedger: the chain-facing port. `SimulatedLedger` is an executable
-// mirror of contracts/memora/sources/site.move and sentinel_registry.move.
+// mirror of contracts/sigil/sources/site.move and sentinel_registry.move.
 // It uses the same rules and the same abort codes, so agents can plan
 // against it locally and the test suite pins the contract semantics. A Sui
 // adapter implements the same interface by building PTBs against the
@@ -25,7 +25,7 @@ export class MoveAbort extends Error {
   readonly fn: string;
   constructor(code: number, fn: string) {
     const name = Object.entries(Abort).find(([, v]) => v === code)?.[0] ?? "EUnknown";
-    super(`memora::site::${fn} aborted with ${name} (${code})`);
+    super(`sigil::site::${fn} aborted with ${name} (${code})`);
     this.code = code;
     this.fn = fn;
   }

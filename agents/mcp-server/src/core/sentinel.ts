@@ -28,9 +28,9 @@ export interface SentinelReport {
 }
 
 export function sentinelBinary(): string {
-  if (process.env.MEMORA_SENTINEL_BIN) return process.env.MEMORA_SENTINEL_BIN;
+  if (process.env.SIGIL_SENTINEL_BIN) return process.env.SIGIL_SENTINEL_BIN;
   const here = dirname(fileURLToPath(import.meta.url));
-  return resolve(here, "../../../sentinel/target/release/memora-sentinel");
+  return resolve(here, "../../../sentinel/target/release/sigil-sentinel");
 }
 
 async function materialize(files: BuildFile[], dir: string) {
@@ -46,8 +46,8 @@ async function materialize(files: BuildFile[], dir: string) {
 export async function scanBuild(candidate: BuildFile[], baseline?: BuildFile[]): Promise<SentinelReport> {
   const bin = sentinelBinary();
   if (!existsSync(bin))
-    throw new Error(`sentinel binary not found at ${bin}; run \`cargo build --release\` in agents/sentinel or set MEMORA_SENTINEL_BIN`);
-  const work = await mkdtemp(join(tmpdir(), "memora-scan-"));
+    throw new Error(`sentinel binary not found at ${bin}; run \`cargo build --release\` in agents/sentinel or set SIGIL_SENTINEL_BIN`);
+  const work = await mkdtemp(join(tmpdir(), "sigil-scan-"));
   try {
     const cand = join(work, "candidate");
     await mkdir(cand);

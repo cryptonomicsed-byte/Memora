@@ -1,13 +1,13 @@
 /// Staked Sentinels: the security reviewers who attest to site builds.
 ///
-/// A Sentinel is usually an autonomous agent running `memora-sentinel` in a
+/// A Sentinel is usually an autonomous agent running `sigil-sentinel` in a
 /// sandbox, but the contract doesn't care what it is. It only needs a bonded
-/// MEMO stake. An attestation is a claim backed by that stake. If a build a
+/// SIGIL stake. An attestation is a claim backed by that stake. If a build a
 /// Sentinel called clean is later revoked as malicious, the SlashCap holder
-/// (a DAO or multi-sig) can slash the bond, and the slashed MEMO is burned.
-module memora::sentinel_registry;
+/// (a DAO or multi-sig) can slash the bond, and the slashed SIGIL is burned.
+module sigil::sentinel_registry;
 
-use memora::memo::{MEMO, BurnVault, burn_slashed};
+use sigil::sigil::{SIGIL, BurnVault, burn_slashed};
 use sui::balance::{Self, Balance};
 use sui::clock::Clock;
 use sui::coin::{Self, Coin};
@@ -26,7 +26,7 @@ const BPS: u64 = 10_000;
 /// detected, so a Sentinel can't attest to a drainer and then unbond before
 /// it's caught.
 const UNBONDING_MS: u64 = 7 * 24 * 60 * 60 * 1000;
-/// 10,000 MEMO.
+/// 10,000 SIGIL.
 const DEFAULT_MIN_STAKE: u64 = 10_000_000_000_000;
 
 public struct Registry has key {
@@ -34,7 +34,7 @@ public struct Registry has key {
     min_stake: u64,
     stakes: Table<address, u64>,
     unbonding_until: Table<address, u64>,
-    vault: Balance<MEMO>,
+    vault: Balance<SIGIL>,
 }
 
 /// Held by governance. Can slash and set parameters, but can't move stake
@@ -56,7 +56,7 @@ fun init(ctx: &mut TxContext) {
     transfer::public_transfer(SlashCap { id: object::new(ctx) }, ctx.sender());
 }
 
-public fun stake(reg: &mut Registry, c: Coin<MEMO>, ctx: &TxContext) {
+public fun stake(reg: &mut Registry, c: Coin<SIGIL>, ctx: &TxContext) {
     let who = ctx.sender();
     assert!(!reg.unbonding_until.contains(who), EUnbonding);
     let add = c.value();
@@ -84,7 +84,7 @@ public fun request_unbond(reg: &mut Registry, clock: &Clock, ctx: &TxContext) {
     event::emit(UnbondRequested { sentinel: who, unlock_ms });
 }
 
-public fun withdraw(reg: &mut Registry, clock: &Clock, ctx: &mut TxContext): Coin<MEMO> {
+public fun withdraw(reg: &mut Registry, clock: &Clock, ctx: &mut TxContext): Coin<SIGIL> {
     let who = ctx.sender();
     assert!(reg.unbonding_until.contains(who), ENotUnbonding);
     assert!(clock.timestamp_ms() >= *reg.unbonding_until.borrow(who), EStillLocked);

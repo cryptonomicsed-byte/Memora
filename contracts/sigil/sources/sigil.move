@@ -1,22 +1,22 @@
-/// MEMO: the Memora platform token.
+/// SIGIL: the Sigil platform token.
 ///
 /// Fixed supply. The whole supply is minted once at publish time; the
 /// TreasuryCap is then locked inside a shared `BurnVault` that exposes
 /// *burn only*. Nobody, including the deployer, can mint again, which is
 /// what makes buyback-and-burn a real supply reduction.
-module memora::memo;
+module sigil::sigil;
 
 use sui::coin::{Self, Coin, TreasuryCap};
 use sui::event;
 
-/// 1,000,000,000 MEMO with 9 decimals.
+/// 1,000,000,000 SIGIL with 9 decimals.
 const TOTAL_SUPPLY: u64 = 1_000_000_000_000_000_000;
 
-public struct MEMO has drop {}
+public struct SIGIL has drop {}
 
 public struct BurnVault has key {
     id: UID,
-    cap: TreasuryCap<MEMO>,
+    cap: TreasuryCap<SIGIL>,
     total_burned: u64,
 }
 
@@ -31,12 +31,12 @@ const REASON_BUYBACK: u8 = 0;
 const REASON_SLASH: u8 = 1;
 
 #[allow(deprecated_usage)]
-fun init(witness: MEMO, ctx: &mut TxContext) {
+fun init(witness: SIGIL, ctx: &mut TxContext) {
     let (mut cap, metadata) = coin::create_currency(
         witness,
         9,
-        b"MEMO",
-        b"Memora",
+        b"SIGIL",
+        b"Sigil",
         b"Captures fees from agent-native, content-addressed dApp hosting.",
         option::none(),
         ctx,
@@ -47,15 +47,15 @@ fun init(witness: MEMO, ctx: &mut TxContext) {
     transfer::share_object(BurnVault { id: object::new(ctx), cap, total_burned: 0 });
 }
 
-public fun burn_buyback(vault: &mut BurnVault, c: Coin<MEMO>): u64 {
+public fun burn_buyback(vault: &mut BurnVault, c: Coin<SIGIL>): u64 {
     burn(vault, c, REASON_BUYBACK)
 }
 
-public(package) fun burn_slashed(vault: &mut BurnVault, c: Coin<MEMO>): u64 {
+public(package) fun burn_slashed(vault: &mut BurnVault, c: Coin<SIGIL>): u64 {
     burn(vault, c, REASON_SLASH)
 }
 
-fun burn(vault: &mut BurnVault, c: Coin<MEMO>, reason: u8): u64 {
+fun burn(vault: &mut BurnVault, c: Coin<SIGIL>, reason: u8): u64 {
     let amount = coin::burn(&mut vault.cap, c);
     vault.total_burned = vault.total_burned + amount;
     event::emit(Burned { amount, total_burned: vault.total_burned, reason });

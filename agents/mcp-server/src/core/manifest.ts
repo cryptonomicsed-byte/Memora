@@ -52,7 +52,7 @@ export function manifestOf(files: BuildFile[]): BuildManifest {
 export function packBundle(files: BuildFile[]): Buffer {
   const manifest = manifestOf(files);
   const body = {
-    format: "memora-bundle/1",
+    format: "sigil-bundle/1",
     manifest,
     files: files.map((f) => ({ path: f.path, data: f.bytes.toString("base64") })),
   };
@@ -61,7 +61,7 @@ export function packBundle(files: BuildFile[]): Buffer {
 
 export function unpackBundle(bytes: Buffer): { manifest: BuildManifest; files: BuildFile[] } {
   const body = JSON.parse(bytes.toString("utf8"));
-  if (body.format !== "memora-bundle/1") throw new Error(`unknown bundle format: ${body.format}`);
+  if (body.format !== "sigil-bundle/1") throw new Error(`unknown bundle format: ${body.format}`);
   const files: BuildFile[] = body.files.map((f: { path: string; data: string }) => ({
     path: f.path,
     bytes: Buffer.from(f.data, "base64"),

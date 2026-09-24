@@ -10,9 +10,9 @@
 ///     AND a quorum of staked Sentinel attestations.
 ///   * Moving back (roll back to a build that already passed that gate)
 ///     needs just one signer, so incident response takes one transaction.
-module memora::site;
+module sigil::site;
 
-use memora::sentinel_registry::{Self, Registry};
+use sigil::sentinel_registry::{Self, Registry};
 use std::string::String;
 use sui::clock::Clock;
 use sui::event;

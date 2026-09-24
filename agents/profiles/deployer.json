@@ -6,7 +6,7 @@
     "Never try to bypass signer threshold or Sentinel quorum"
   ],
   "preferences": { "storage": "walrus", "epochs": 5, "retryOnPublisherError": 3 },
-  "skills": ["memora_build_manifest", "memora_deploy", "memora_site_status", "memora_recall"],
+  "skills": ["sigil_build_manifest", "sigil_deploy", "sigil_site_status", "sigil_recall"],
   "memoryNamespace": "deployer",
   "sandbox": { "kind": "process", "capabilities": ["fs:read:build-dir", "net:walrus-publisher", "sign:proposer-key"] }
 }

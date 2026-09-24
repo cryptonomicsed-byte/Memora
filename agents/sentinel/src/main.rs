@@ -1,7 +1,7 @@
-//! CLI wrapper: `memora-sentinel scan <build-dir> [--baseline <live-build-dir>]`
+//! CLI wrapper: `sigil-sentinel scan <build-dir> [--baseline <live-build-dir>]`
 //! Prints a JSON report on stdout. Exit code: 0 clean, 1 review, 2 block, 64 usage.
 
-use memora_sentinel::{scan, SourceFile, Verdict};
+use sigil_sentinel::{scan, SourceFile, Verdict};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -35,7 +35,7 @@ fn load(dir: &Path) -> Result<Vec<(String, String)>, String> {
 }
 
 fn usage() -> ExitCode {
-    eprintln!("usage: memora-sentinel scan <build-dir> [--baseline <live-build-dir>]");
+    eprintln!("usage: sigil-sentinel scan <build-dir> [--baseline <live-build-dir>]");
     ExitCode::from(64)
 }
 

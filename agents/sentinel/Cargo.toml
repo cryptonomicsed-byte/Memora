@@ -1,16 +1,16 @@
 [package]
-name = "memora-sentinel"
+name = "sigil-sentinel"
 version = "0.1.0"
 edition = "2021"
-description = "Static drainer/supply-chain scanner run by staked Memora Sentinel agents before a site build may go live"
+description = "Static drainer/supply-chain scanner run by staked Sigil Sentinel agents before a site build may go live"
 license = "Apache-2.0"
 
 [lib]
-name = "memora_sentinel"
+name = "sigil_sentinel"
 path = "src/lib.rs"
 
 [[bin]]
-name = "memora-sentinel"
+name = "sigil-sentinel"
 path = "src/main.rs"
 
 # Deliberately zero dependencies: the core is pure (no IO) so it compiles to

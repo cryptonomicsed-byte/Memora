@@ -6,9 +6,9 @@
 /// bounds what a compromised keeper could take: at most `max_draw` per call,
 /// no more than once per `min_interval_ms`. Every draw emits the blob it was
 /// meant to renew, so watchers can check the matching extension happened.
-module memora::storage_vault;
+module sigil::storage_vault;
 
-use memora::treasury::KeeperCap;
+use sigil::treasury::KeeperCap;
 use std::string::String;
 use sui::balance::{Self, Balance};
 use sui::clock::Clock;
